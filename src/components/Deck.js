@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { View, Animated } from 'react-native';
-import Card from './Card';
+import { Card } from 'react-native-elements';
 
 export default class Deck extends Component {
 
@@ -9,8 +9,8 @@ export default class Deck extends Component {
       return (
         <Card
           key={card._id}
-          text={card.text}
-          img={card.img}
+          title={card.text}
+          image={{ uri: card.img }}
         />
       );
     });
