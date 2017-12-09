@@ -1,20 +1,33 @@
 import React, { Component } from 'react';
 import { Text, View } from 'react-native';
 import Deck from './src/components/Deck';
-
-const DATA = [
-  {_id: 1, text: 'Card 1', img: ''},
-  {_id: 2, text: 'Card 2', img: ''},
-  {_id: 3, text: 'Card 3', img: ''}
-];
+import axios from 'axios';
 
 export default class App extends Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      data: []
+    }
+  }
+
+  componentDidMount() {
+    axios.get('https://shrouded-scrubland-99138.herokuapp.com/api/movies')
+    .then(response => {
+      const data = response.data;
+      this.setState({ data });
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+  }
 
   render() {
     return (
       <View style={styles.container}>
         <Deck
-          data={DATA}
+          data={this.state.data}
         />
       </View>
     );
@@ -24,8 +37,6 @@ export default class App extends Component {
 const styles = {
   container: {
     flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center'
+    marginTop: 15
   }
 }

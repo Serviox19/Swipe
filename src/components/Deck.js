@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import { View, Animated } from 'react-native';
-import { Card } from 'react-native-elements';
+import { View, Text, Animated } from 'react-native';
+import { Card, Button } from 'react-native-elements';
 
 export default class Deck extends Component {
 
@@ -8,10 +8,19 @@ export default class Deck extends Component {
     return this.props.data.map(card => {
       return (
         <Card
-          key={card._id}
-          title={card.text}
-          image={{ uri: card.img }}
-        />
+          image={{ uri: card.poster }}
+          imageStyle={{ alignSelf: 'stretch' }}
+          title={card.title}
+          key={card.release_date}
+        >
+          <Text style={{ marginBottom: 15 }}>{card.release_date}</Text>
+          <Text style={{ marginBottom: 15 }}>{card.description}</Text>
+          <Button
+            icon={{ name: 'code' }}
+            backgroundColor="#03A9F4"
+            title="View Now"
+          />
+        </Card>
       );
     });
   }
@@ -25,6 +34,8 @@ export default class Deck extends Component {
   }
 }
 
-const styes = {
+const styles = {
+  viewStyle: {
 
+  }
 }
