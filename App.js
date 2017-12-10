@@ -12,7 +12,7 @@ export default class App extends Component {
     }
   }
 
-  componentDidMount() {
+  componentWillMount() {
     axios.get('https://shrouded-scrubland-99138.herokuapp.com/api/movies')
     .then(response => {
       const data = response.data;

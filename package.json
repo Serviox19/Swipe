@@ -4,7 +4,8 @@
   "dependencies": {
     "axios": "^0.17.1",
     "expo": "^23.0.6",
-    "react": "^16.2.0",
+    "moment": "^2.19.3",
+    "react": "^16.0.0",
     "react-native": "https://github.com/expo/react-native/archive/sdk-23.0.0.tar.gz",
     "react-native-elements": "^0.18.5"
   }
