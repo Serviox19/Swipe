@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import {
   View,
+  ListView,
   Text,
   Animated,
   PanResponder,
@@ -10,6 +11,8 @@ import { Card, Button } from 'react-native-elements';
 import moment from 'moment';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
+const SWIPE_THRESH = 0.25 * SCREEN_WIDTH;
+const SWIPE_OUT_DURATION = 250;
 
 export default class Deck extends Component {
   constructor(props) {
@@ -20,19 +23,42 @@ export default class Deck extends Component {
     const panResponder = PanResponder.create({
       onStartShouldSetPanResponder: () => true,
       onPanResponderMove: (event, gesture) => {
-        console.log(gesture);
         position.setValue({ x: gesture.dx });
       },
-      onPanResponderRelease: () => {
-        this.resetPosition();
+      onPanResponderRelease: (event, gesture) => {
+        this.detectRotate(gesture);
       }
     });
     this.state = { panResponder, position };
   }
 
+  detectRotate(gesture) {
+    if (gesture.dx > SWIPE_THRESH) {
+      this.animateOutRight();
+    } else if (gesture.dx < -SWIPE_THRESH) {
+      this.animateOutLeft();
+    } else {
+      this.resetPosition();
+    }
+  }
+
+  animateOutLeft() {
+    Animated.timing(this.state.position, {
+      toValue: { x: -SCREEN_WIDTH * 2, y: 0 },
+      duration: SWIPE_OUT_DURATION
+    }).start();
+  }
+
+  animateOutRight() {
+    Animated.timing(this.state.position, {
+      toValue: { x: SCREEN_WIDTH * 2, y: 0 },
+      duration: SWIPE_OUT_DURATION
+    }).start();
+  }
+
   resetPosition() {
     Animated.spring(this.state.position, {
-      toValue: {x: 0, y: 0}
+      toValue: { x: 0 }
     }).start();
   }
 
