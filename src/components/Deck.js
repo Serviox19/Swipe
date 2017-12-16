@@ -5,7 +5,9 @@ import {
   Text,
   Animated,
   PanResponder,
-  Dimensions
+  Dimensions,
+  LayoutAnimation,
+  UIManager
 } from 'react-native';
 import { Card, Button } from 'react-native-elements';
 import moment from 'moment';
@@ -35,6 +37,20 @@ export default class Deck extends Component {
       }
     });
     this.state = { panResponder, position, index: 0 };
+  }
+
+  componentWillReceiveProps(nextProps) {
+    //re-render with new props
+    if (nextProps.data !== this.props.data) {
+      this.setState({ index: 0 });
+    }
+  }
+
+  componentWillUpdate() {
+    //Android compatability
+    UIManager.setLayoutAnimationEnabledExperimental && UIManager.setLayoutAnimationEnabledExperimental(true);
+    //next time component re-renders, animate changes!
+    // LayoutAnimation.spring();
   }
 
   detectRotate(gesture) {
@@ -93,7 +109,7 @@ export default class Deck extends Component {
           </Text>
           <Button
             backgroundColor="#03A9F4"
-            title="Load More"
+            title="Reset"
             onPress={() => this.setState({ index: 0 })}
           />
         </Card>
@@ -108,7 +124,7 @@ export default class Deck extends Component {
 
       if (i === this.state.index ) {
         return (
-          <Animated.View key={0} style={this.getCardStyle()}>
+          <Animated.View key={0} style={[this.getCardStyle(), styles.cardStyle]}>
             <Card
               {...this.state.panResponder.panHandlers}
               image={{ uri: card.poster }}
@@ -128,7 +144,9 @@ export default class Deck extends Component {
         )
       }
       return (
-        <View key={card._id}>
+        <Animated.View
+          key={card._id}
+          style={[styles.cardStyle, { top: 10 * ( i - this.state.index ) }]}>
           <Card
             image={{ uri: card.poster }}
             imageStyle={{ height: 300 }}
@@ -142,9 +160,9 @@ export default class Deck extends Component {
               title="View Now"
             />
           </Card>
-        </View>
+        </Animated.View>
       );
-    });
+    }).reverse();
   }
 
   render() {
@@ -156,4 +174,10 @@ export default class Deck extends Component {
   }
 }
 
-const styles = {}
+const styles = {
+  cardStyle: {
+    position: 'absolute',
+    width: SCREEN_WIDTH,
+    minHeight: 700
+  }
+}
