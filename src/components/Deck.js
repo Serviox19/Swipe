@@ -85,11 +85,28 @@ export default class Deck extends Component {
   }
 
   renderCards() {
+    if (this.state.index >= this.props.data.length) {
+      return (
+        <Card title="Ooops">
+          <Text style={{ marginBottom: 10, textAlign: 'center' }}>
+            Theres no more cards to display
+          </Text>
+          <Button
+            backgroundColor="#03A9F4"
+            title="Load More"
+            onPress={() => this.setState({ index: 0 })}
+          />
+        </Card>
+      )
+    }
+
     return this.props.data.map((card, i) => {
+
       if (i < this.state.index) {
         return null;
       }
-      if (i === this.state.index) {
+
+      if (i === this.state.index ) {
         return (
           <Animated.View key={0} style={this.getCardStyle()}>
             <Card
