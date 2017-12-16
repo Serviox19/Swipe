@@ -15,6 +15,11 @@ const SWIPE_THRESH = 0.25 * SCREEN_WIDTH;
 const SWIPE_OUT_DURATION = 250;
 
 export default class Deck extends Component {
+  static defaultProps = {
+    onSwipeLeft: () => {},
+    onSwipeRight: () => {}
+  }
+
   constructor(props) {
     super(props);
 
@@ -29,31 +34,35 @@ export default class Deck extends Component {
         this.detectRotate(gesture);
       }
     });
-    this.state = { panResponder, position };
+    this.state = { panResponder, position, index: 0 };
   }
 
   detectRotate(gesture) {
     if (gesture.dx > SWIPE_THRESH) {
-      this.animateOutRight();
+      this.animateOut('right');
     } else if (gesture.dx < -SWIPE_THRESH) {
-      this.animateOutLeft();
+      this.animateOut('left');
     } else {
       this.resetPosition();
     }
   }
 
-  animateOutLeft() {
+  animateOut(direction) {
+    //important line of code
+    const x = direction === 'right' ? SCREEN_WIDTH : -SCREEN_WIDTH;
     Animated.timing(this.state.position, {
-      toValue: { x: -SCREEN_WIDTH * 2, y: 0 },
+      toValue: { x: x * 2, y: 0 },
       duration: SWIPE_OUT_DURATION
-    }).start();
+    }).start(() => this.onSwipeComplete(direction));
   }
 
-  animateOutRight() {
-    Animated.timing(this.state.position, {
-      toValue: { x: SCREEN_WIDTH * 2, y: 0 },
-      duration: SWIPE_OUT_DURATION
-    }).start();
+  onSwipeComplete(direction) {
+    const { onSwipeLeft, onSwipeRight, data } = this.props;
+    const item = data[this.state.index];
+
+    direction === 'right' ? onSwipeRight(item) : onSwipeLeft(item);
+    this.state.position.setValue({ x: 0, y: 0 });
+    this.setState({ index: this.state.index + 1 });
   }
 
   resetPosition() {
@@ -76,8 +85,11 @@ export default class Deck extends Component {
   }
 
   renderCards() {
-    return this.props.data.map((card, index) => {
-      if (index === 0) {
+    return this.props.data.map((card, i) => {
+      if (i < this.state.index) {
+        return null;
+      }
+      if (i === this.state.index) {
         return (
           <Animated.View key={0} style={this.getCardStyle()}>
             <Card
@@ -85,7 +97,7 @@ export default class Deck extends Component {
               image={{ uri: card.poster }}
               imageStyle={{ height: 300 }}
               title={card.title}
-              key={card.release_date}
+              key={card._id}
             >
               <Text style={{ marginBottom: 15 }}>{moment(card.release_date).format("MMMM DD YYYY")}</Text>
               <Text style={{ marginBottom: 15 }}>{card.description}</Text>
@@ -99,7 +111,7 @@ export default class Deck extends Component {
         )
       }
       return (
-        <View key={card.release_date}>
+        <View key={card._id}>
           <Card
             image={{ uri: card.poster }}
             imageStyle={{ height: 300 }}
